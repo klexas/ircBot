@@ -1,6 +1,8 @@
+// TODO: Let do it in RUST 
+
 exports.Client = Client;
-var net  = require('net');
-var tls  = require('tls');
+var net = require('net');
+var tls = require('tls');
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
@@ -39,9 +41,9 @@ function Client(server, nick, opt) {
         messageSplit: 512,
         encoding: false,
         webirc: {
-          pass: '',
-          ip: '',
-          host: ''
+            pass: '',
+            ip: '',
+            host: ''
         },
         millisecondsOfSilenceBeforePingSent: 15 * 1000,
         millisecondsBeforePingTimeout: 8 * 1000
@@ -55,7 +57,7 @@ function Client(server, nick, opt) {
             idlength: [],
             length: 200,
             limit: [],
-            modes: { a: '', b: '', c: '', d: ''},
+            modes: { a: '', b: '', c: '', d: '' },
             types: self.opt.channelPrefixes
         },
         kicklength: 0,
@@ -88,7 +90,7 @@ function Client(server, nick, opt) {
         self.connect();
     }
 
-    self.addListener('raw', function(message) {
+    self.addListener('raw', function (message) {
         var channels = [],
             channel,
             nick,
@@ -112,7 +114,7 @@ function Client(server, nick, opt) {
                 self.hostMask = welcomeStringWords[welcomeStringWords.length - 1];
                 self._updateMaxLineLength();
                 self.emit('registered', message);
-                self.whois(self.nick, function(args) {
+                self.whois(self.nick, function (args) {
                     self.nick = args.nick;
                     self.hostMask = args.user + '@' + args.host;
                     self._updateMaxLineLength();
@@ -122,7 +124,7 @@ function Client(server, nick, opt) {
                 self.supported.usermodes = message.args[3];
                 break;
             case 'rpl_isupport':
-                message.args.forEach(function(arg) {
+                message.args.forEach(function (arg) {
                     var match;
                     match = arg.match(/([A-Z]+)=(.*)/);
                     if (match) {
@@ -130,7 +132,7 @@ function Client(server, nick, opt) {
                         var value = match[2];
                         switch (param) {
                             case 'CHANLIMIT':
-                                value.split(',').forEach(function(val) {
+                                value.split(',').forEach(function (val) {
                                     val = val.split(':');
                                     self.supported.channel.limit[val[0]] = parseInt(val[1]);
                                 });
@@ -149,7 +151,7 @@ function Client(server, nick, opt) {
                                 self.supported.channel.length = parseInt(value);
                                 break;
                             case 'IDCHAN':
-                                value.split(',').forEach(function(val) {
+                                value.split(',').forEach(function (val) {
                                     val = val.split(':');
                                     self.supported.channel.idlength[val[0]] = val[1];
                                 });
@@ -158,7 +160,7 @@ function Client(server, nick, opt) {
                                 self.supported.kicklength = value;
                                 break;
                             case 'MAXLIST':
-                                value.split(',').forEach(function(val) {
+                                value.split(',').forEach(function (val) {
                                     val = val.split(':');
                                     self.supported.maxlist[val[0]] = parseInt(val[1]);
                                 });
@@ -181,7 +183,7 @@ function Client(server, nick, opt) {
                             case 'STATUSMSG':
                                 break;
                             case 'TARGMAX':
-                                value.split(',').forEach(function(val) {
+                                value.split(',').forEach(function (val) {
                                     val = val.split(':');
                                     val[1] = (!val[1]) ? 0 : parseInt(val[1]);
                                     self.supported.maxtargets[val[0]] = val[1];
@@ -248,7 +250,7 @@ function Client(server, nick, opt) {
                 var modeList = message.args[1].split('');
                 var adding = true;
                 var modeArgs = message.args.slice(2);
-                modeList.forEach(function(mode) {
+                modeList.forEach(function (mode) {
                     if (mode == '+') {
                         adding = true;
                         return;
@@ -261,7 +263,7 @@ function Client(server, nick, opt) {
                     var eventName = (adding ? '+' : '-') + 'mode';
                     var supported = self.supported.channel.modes;
                     var modeArg;
-                    var chanModes = function(mode, param) {
+                    var chanModes = function (mode, param) {
                         var arr = param && Array.isArray(param);
                         if (adding) {
                             if (channel.mode.indexOf(mode) == -1) {
@@ -278,7 +280,7 @@ function Client(server, nick, opt) {
                         } else {
                             if (arr) {
                                 channel.modeParams[mode] = channel.modeParams[mode]
-                                    .filter(function(v) { return v !== param[0]; });
+                                    .filter(function (v) { return v !== param[0]; });
                             }
                             if (!arr || channel.modeParams[mode].length === 0) {
                                 channel.mode = channel.mode.replace(mode, '');
@@ -327,7 +329,7 @@ function Client(server, nick, opt) {
                 channels = [];
 
                 // TODO better way of finding what channels a user is in?
-                Object.keys(self.chans).forEach(function(channame) {
+                Object.keys(self.chans).forEach(function (channame) {
                     var channel = self.chans[channame];
                     channel.users[message.args[0]] = channel.users[message.nick];
                     delete channel.users[message.nick];
@@ -352,7 +354,7 @@ function Client(server, nick, opt) {
                 channel = self.chanData(message.args[2]);
                 var users = message.args[3].trim().split(/ +/);
                 if (channel) {
-                    users.forEach(function(user) {
+                    users.forEach(function (user) {
                         var match = user.match(/^(.)(.*)$/);
                         if (match) {
                             if (match[1] in self.modeForPrefix) {
@@ -391,7 +393,7 @@ function Client(server, nick, opt) {
                 self._addWhoisData(message.args[1], 'idle', message.args[2]);
                 break;
             case 'rpl_whoischannels':
-               // TODO - clean this up?
+                // TODO - clean this up?
                 self._addWhoisData(message.args[1], 'channels', message.args[2].trim().split(/\s+/));
                 break;
             case 'rpl_whoisserver':
@@ -503,7 +505,7 @@ function Client(server, nick, opt) {
                 self.emit('kick' + message.args[0], message.args[1], message.nick, message.args[2], message);
                 if (message.args[0] != message.args[0].toLowerCase()) {
                     self.emit('kick' + message.args[0].toLowerCase(),
-                              message.args[1], message.nick, message.args[2], message);
+                        message.args[1], message.nick, message.args[2], message);
                 }
 
                 if (self.nick == message.args[1]) {
@@ -520,7 +522,7 @@ function Client(server, nick, opt) {
             case 'KILL':
                 nick = message.args[0];
                 channels = [];
-                Object.keys(self.chans).forEach(function(channame) {
+                Object.keys(self.chans).forEach(function (channame) {
                     var channel = self.chans[channame];
                     channels.push(channame);
                     delete channel.users[nick];
@@ -566,7 +568,7 @@ function Client(server, nick, opt) {
                 channels = [];
 
                 // TODO better way of finding what channels a user is in?
-                Object.keys(self.chans).forEach(function(channame) {
+                Object.keys(self.chans).forEach(function (channame) {
                     var channel = self.chans[channame];
                     delete channel.users[message.nick];
                     channels.push(channame);
@@ -579,8 +581,8 @@ function Client(server, nick, opt) {
             // for sasl
             case 'CAP':
                 if (message.args[0] === '*' &&
-                     message.args[1] === 'ACK' &&
-                     message.args[2] === 'sasl ') // there's a space after sasl
+                    message.args[1] === 'ACK' &&
+                    message.args[2] === 'sasl ') // there's a space after sasl
                     self.send('AUTHENTICATE', 'PLAIN');
                 break;
             case 'AUTHENTICATE':
@@ -633,12 +635,12 @@ function Client(server, nick, opt) {
         }
     });
 
-    self.addListener('kick', function(channel, who, by, reason) {
+    self.addListener('kick', function (channel, who, by, reason) {
         if (self.opt.autoRejoin)
             self.send.apply(self, ['JOIN'].concat(channel.split(' ')));
     });
-    self.addListener('motd', function(motd) {
-        self.opt.channels.forEach(function(channel) {
+    self.addListener('motd', function (motd) {
+        self.opt.channels.forEach(function (channel) {
             self.send.apply(self, ['JOIN'].concat(channel.split(' ')));
         });
     });
@@ -653,7 +655,7 @@ Client.prototype.modeForPrefix = {};
 Client.prototype.chans = {};
 Client.prototype._whoisData = {};
 
-Client.prototype.connectionTimedOut = function(conn) {
+Client.prototype.connectionTimedOut = function (conn) {
     var self = this;
     if (conn !== self.conn) {
         // Only care about a timeout event if it came from the connection
@@ -663,9 +665,9 @@ Client.prototype.connectionTimedOut = function(conn) {
     self.end();
 };
 
-(function() {
+(function () {
     var pingCounter = 1;
-    Client.prototype.connectionWantsPing = function(conn) {
+    Client.prototype.connectionWantsPing = function (conn) {
         var self = this;
         if (conn !== self.conn) {
             // Only care about a wantPing event if it came from the connection
@@ -676,7 +678,7 @@ Client.prototype.connectionTimedOut = function(conn) {
     };
 }());
 
-Client.prototype.chanData = function(name, create) {
+Client.prototype.chanData = function (name, create) {
     var key = name.toLowerCase();
     if (create) {
         this.chans[key] = this.chans[key] || {
@@ -691,7 +693,7 @@ Client.prototype.chanData = function(name, create) {
     return this.chans[key];
 };
 
-Client.prototype._connectionHandler = function() {
+Client.prototype._connectionHandler = function () {
     if (this.opt.webirc.ip && this.opt.webirc.pass && this.opt.webirc.host) {
         this.send('WEBIRC', this.opt.webirc.pass, this.opt.userName, this.opt.webirc.host, this.opt.webirc.ip);
     }
@@ -713,7 +715,7 @@ Client.prototype._connectionHandler = function() {
     this.emit('connect');
 };
 
-Client.prototype.connect = function(retryCount, callback) {
+Client.prototype.connect = function (retryCount, callback) {
     if (typeof (retryCount) === 'function') {
         callback = retryCount;
         retryCount = undefined;
@@ -746,16 +748,16 @@ Client.prototype.connect = function(retryCount, callback) {
             }
         }
 
-        self.conn = tls.connect(connectionOpts, function() {
+        self.conn = tls.connect(connectionOpts, function () {
             // callback called only after successful socket connection
             self.conn.connected = true;
             if (self.conn.authorized ||
                 (self.opt.selfSigned &&
-                    (self.conn.authorizationError   === 'DEPTH_ZERO_SELF_SIGNED_CERT' ||
-                     self.conn.authorizationError === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' ||
-                     self.conn.authorizationError === 'SELF_SIGNED_CERT_IN_CHAIN')) ||
+                    (self.conn.authorizationError === 'DEPTH_ZERO_SELF_SIGNED_CERT' ||
+                        self.conn.authorizationError === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' ||
+                        self.conn.authorizationError === 'SELF_SIGNED_CERT_IN_CHAIN')) ||
                 (self.opt.certExpired &&
-                 self.conn.authorizationError === 'CERT_HAS_EXPIRED')) {
+                    self.conn.authorizationError === 'CERT_HAS_EXPIRED')) {
                 // authorization successful
 
                 if (!self.opt.encoding) {
@@ -785,11 +787,11 @@ Client.prototype.connect = function(retryCount, callback) {
     // Since the client's "current connection" value changes over time because of retry functionality,
     // the client should ignore timeout/wantPing events that come from old connections.
     self.conn.cyclingPingTimer = new CyclingPingTimer(self);
-    (function(conn) {
-        conn.cyclingPingTimer.on('pingTimeout', function() {
+    (function (conn) {
+        conn.cyclingPingTimer.on('pingTimeout', function () {
             self.connectionTimedOut(conn);
         });
-        conn.cyclingPingTimer.on('wantPing', function() {
+        conn.cyclingPingTimer.on('wantPing', function () {
             self.connectionWantsPing(conn);
         });
     }(self.conn));
@@ -835,11 +837,11 @@ Client.prototype.connect = function(retryCount, callback) {
     }
 
     self.conn.addListener('data', handleData);
-    self.conn.addListener('end', function() {
+    self.conn.addListener('end', function () {
         if (self.opt.debug)
             util.log('Connection got "end" event');
     });
-    self.conn.addListener('close', function() {
+    self.conn.addListener('close', function () {
         if (self.opt.debug)
             util.log('Connection got "close" event');
 
@@ -858,11 +860,11 @@ Client.prototype.connect = function(retryCount, callback) {
         if (self.opt.debug) {
             util.log('Waiting ' + self.opt.retryDelay + 'ms before retrying');
         }
-        setTimeout(function() {
+        setTimeout(function () {
             self.connect(retryCount + 1);
         }, self.opt.retryDelay);
     });
-    self.conn.addListener('error', function(exception) {
+    self.conn.addListener('error', function (exception) {
         self.emit('netError', exception);
         if (self.opt.debug) {
             util.log('Network error: ' + exception);
@@ -870,7 +872,7 @@ Client.prototype.connect = function(retryCount, callback) {
     });
 };
 
-Client.prototype.end = function() {
+Client.prototype.end = function () {
     if (this.conn) {
         this.conn.cyclingPingTimer.stop();
         this.conn.destroy();
@@ -878,7 +880,7 @@ Client.prototype.end = function() {
     this.conn = null;
 };
 
-Client.prototype.disconnect = function(message, callback) {
+Client.prototype.disconnect = function (message, callback) {
     if (typeof (message) === 'function') {
         callback = message;
         message = undefined;
@@ -902,7 +904,7 @@ Client.prototype.disconnect = function(message, callback) {
     self.conn.end();
 };
 
-Client.prototype.send = function(command) {
+Client.prototype.send = function (command) {
     var args = Array.prototype.slice.call(arguments);
 
     // Note that the command arg is included in the args array as the first element
@@ -919,7 +921,7 @@ Client.prototype.send = function(command) {
     }
 };
 
-Client.prototype.activateFloodProtection = function(interval) {
+Client.prototype.activateFloodProtection = function (interval) {
 
     var cmdQueue = [],
         safeInterval = interval || this.opt.floodProtectionDelay,
@@ -929,19 +931,19 @@ Client.prototype.activateFloodProtection = function(interval) {
 
     // Wrapper for the original function. Just put everything to on central
     // queue.
-    this.send = function() {
+    this.send = function () {
         cmdQueue.push(arguments);
     };
 
-    this._sendImmediate = function() {
+    this._sendImmediate = function () {
         origSend.apply(self, arguments);
     };
 
-    this._clearCmdQueue = function() {
+    this._clearCmdQueue = function () {
         cmdQueue = [];
     };
 
-    dequeue = function() {
+    dequeue = function () {
         var args = cmdQueue.shift();
         if (args) {
             origSend.apply(self, args);
@@ -953,9 +955,9 @@ Client.prototype.activateFloodProtection = function(interval) {
     dequeue();
 };
 
-Client.prototype.join = function(channel, callback) {
-    var channelName =  channel.split(' ')[0];
-    this.once('join' + channelName, function() {
+Client.prototype.join = function (channel, callback) {
+    var channelName = channel.split(' ')[0];
+    this.once('join' + channelName, function () {
         // if join is successful, add this channel to opts.channels
         // so that it will be re-joined upon reconnect (as channels
         // specified in options are)
@@ -970,7 +972,7 @@ Client.prototype.join = function(channel, callback) {
     this.send.apply(this, ['JOIN'].concat(channel.split(' ')));
 };
 
-Client.prototype.part = function(channel, message, callback) {
+Client.prototype.part = function (channel, message, callback) {
     if (typeof (message) === 'function') {
         callback = message;
         message = undefined;
@@ -992,18 +994,18 @@ Client.prototype.part = function(channel, message, callback) {
     }
 };
 
-Client.prototype.action = function(channel, text) {
+Client.prototype.action = function (channel, text) {
     var self = this;
     if (typeof text !== 'undefined') {
-        text.toString().split(/\r?\n/).filter(function(line) {
+        text.toString().split(/\r?\n/).filter(function (line) {
             return line.length > 0;
-        }).forEach(function(line) {
+        }).forEach(function (line) {
             self.say(channel, '\u0001ACTION ' + line + '\u0001');
         });
     }
 };
 
-Client.prototype._splitLongLines = function(words, maxLength, destination) {
+Client.prototype._splitLongLines = function (words, maxLength, destination) {
     maxLength = maxLength || 450; // If maxLength hasn't been initialized yet, prefer an arbitrarily low line length over crashing.
     if (words.length == 0) {
         return destination;
@@ -1037,23 +1039,23 @@ Client.prototype._splitLongLines = function(words, maxLength, destination) {
     return this._splitLongLines(words.substring(cutPos + wsLength, words.length), maxLength, destination);
 };
 
-Client.prototype.say = function(target, text) {
+Client.prototype.say = function (target, text) {
     this._speak('PRIVMSG', target, text);
 };
 
-Client.prototype.notice = function(target, text) {
+Client.prototype.notice = function (target, text) {
     this._speak('NOTICE', target, text);
 };
 
-Client.prototype._speak = function(kind, target, text) {
+Client.prototype._speak = function (kind, target, text) {
     var self = this;
     var maxLength = Math.min(this.maxLineLength - target.length, this.opt.messageSplit);
     if (typeof text !== 'undefined') {
-        text.toString().split(/\r?\n/).filter(function(line) {
+        text.toString().split(/\r?\n/).filter(function (line) {
             return line.length > 0;
-        }).forEach(function(line) {
+        }).forEach(function (line) {
             var linesToSend = self._splitLongLines(line, maxLength, []);
-            linesToSend.forEach(function(toSend) {
+            linesToSend.forEach(function (toSend) {
                 self.send(kind, target, toSend);
                 if (kind == 'PRIVMSG') {
                     self.emit('selfMessage', target, toSend);
@@ -1063,9 +1065,9 @@ Client.prototype._speak = function(kind, target, text) {
     }
 };
 
-Client.prototype.whois = function(nick, callback) {
+Client.prototype.whois = function (nick, callback) {
     if (typeof callback === 'function') {
-        var callbackWrapper = function(info) {
+        var callbackWrapper = function (info) {
             if (info.nick.toLowerCase() == nick.toLowerCase()) {
                 this.removeListener('whois', callbackWrapper);
                 return callback.apply(this, arguments);
@@ -1076,19 +1078,19 @@ Client.prototype.whois = function(nick, callback) {
     this.send('WHOIS', nick);
 };
 
-Client.prototype.list = function() {
+Client.prototype.list = function () {
     var args = Array.prototype.slice.call(arguments, 0);
     args.unshift('LIST');
     this.send.apply(this, args);
 };
 
-Client.prototype._addWhoisData = function(nick, key, value, onlyIfExists) {
+Client.prototype._addWhoisData = function (nick, key, value, onlyIfExists) {
     if (onlyIfExists && !this._whoisData[nick]) return;
-    this._whoisData[nick] = this._whoisData[nick] || {nick: nick};
+    this._whoisData[nick] = this._whoisData[nick] || { nick: nick };
     this._whoisData[nick][key] = value;
 };
 
-Client.prototype._clearWhoisData = function(nick) {
+Client.prototype._clearWhoisData = function (nick) {
     // Ensure that at least the nick exists before trying to return
     this._addWhoisData(nick, 'nick', nick);
     var data = this._whoisData[nick];
@@ -1096,7 +1098,7 @@ Client.prototype._clearWhoisData = function(nick) {
     return data;
 };
 
-Client.prototype._handleCTCP = function(from, to, text, type, message) {
+Client.prototype._handleCTCP = function (from, to, text, type, message) {
     text = text.slice(1);
     text = text.slice(0, text.indexOf('\u0001'));
     var parts = text.split(' ');
@@ -1110,11 +1112,11 @@ Client.prototype._handleCTCP = function(from, to, text, type, message) {
         this.ctcp(from, 'notice', text);
 };
 
-Client.prototype.ctcp = function(to, type, text) {
+Client.prototype.ctcp = function (to, type, text) {
     return this[type === 'privmsg' ? 'say' : 'notice'](to, '\u0001' + text + '\u0001');
 };
 
-Client.prototype.convertEncoding = function(str) {
+Client.prototype.convertEncoding = function (str) {
     var self = this, out = str;
 
     if (self.opt.encoding) {
@@ -1136,7 +1138,7 @@ Client.prototype.convertEncoding = function(str) {
     return out;
 };
 // blatantly stolen from irssi's splitlong.pl. Thanks, Bjoern Krombholz!
-Client.prototype._updateMaxLineLength = function() {
+Client.prototype._updateMaxLineLength = function () {
     // 497 = 510 - (":" + "!" + " PRIVMSG " + " :").length;
     // target is determined in _speak() and subtracted there
     this.maxLineLength = 497 - this.nick.length - this.hostMask.length;

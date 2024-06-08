@@ -548,12 +548,12 @@ function Client(server, nick, opt) {
                 if (self.opt.debug && to == self.nick)
                     util.log('GOT MESSAGE from ' + from + ': ' + text);
                 break;
-            case 'INVITE':
-                from = message.nick;
-                to = message.args[0];
-                channel = message.args[1];
-                self.emit('invite', channel, from, message);
-                break;
+            // case 'INVITE':
+            //     from = message.nick;
+            //     to = message.args[0];
+            //     channel = message.args[1];
+            //     self.emit('invite', channel, from, message);
+            //     break;
             case 'QUIT':
                 if (self.opt.debug)
                     util.log('QUIT: ' + message.prefix + ' ' + message.args.join(' '));

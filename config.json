@@ -1,0 +1,38 @@
+{
+  "connection": {
+    "servers": [
+      {
+        "host": "irc.freenode.net",
+        "port": 6697,
+        "ssl": true
+      }
+    ],
+    "channels": ["#autojoin1", "autojoin2"]
+  },
+  "accounts": [
+    {
+      "ac1": {
+        "ac1": {
+          "group": "nick group it might sit in",
+          "nick": "nickserv acc",
+          "password": "nickserve pass",
+          "keypath": "/dev/null",
+          "isGhost": false
+        },
+        "ac2": {
+          "ns2": {
+            "group": "nick group it might sit in",
+            "nick": "account ghost",
+            "password": "ghost ",
+            "keypath": "/dev/null",
+            "isGhost": false
+          }
+        }
+      }
+    }
+  ],
+  "cs_admin" : {
+    "banlist" : "plantext file of hosts",
+    "k_ban_trigger" : "!escort {0}"
+  }
+}
